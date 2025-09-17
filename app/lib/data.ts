@@ -11,6 +11,55 @@ import { formatCurrency } from './utils';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
+export async function fetchMembers(filters: { kana?: string; ageMin?: string; ageMax?: string; tel?: string }) {
+  const conditions: any[] = [];
+
+  // ふりがな検索
+  if (filters.kana) {
+    conditions.push(
+      sql`(kana_last_name ILIKE ${'%' + filters.kana + '%'} OR kana_first_name ILIKE ${'%' + filters.kana + '%'})`
+    );
+  }
+
+  // 年齢下限
+  if (filters.ageMin) {
+    const min = parseInt(filters.ageMin, 10);
+    if (!isNaN(min)) {
+      conditions.push(sql`age >= ${min}`);
+    }
+  }
+
+  // 年齢上限
+  if (filters.ageMax) {
+    const max = parseInt(filters.ageMax, 10);
+    if (!isNaN(max)) {
+      conditions.push(sql`age <= ${max}`);
+    }
+  }
+
+  // 電話番号
+  if (filters.tel) {
+    conditions.push(sql`tel ILIKE ${'%' + filters.tel + '%'}`);
+  }
+
+  // AND で条件をつなぐ（join が無い環境でも動くように自前で連結）
+  let whereClause = sql``;
+  if (conditions.length > 0) {
+    whereClause = conditions[0];
+    for (let i = 1; i < conditions.length; i++) {
+      whereClause = sql`${whereClause} AND ${conditions[i]}`;
+    }
+  }
+
+  // クエリ本体
+  return sql`
+    SELECT * FROM members
+    WHERE TRUE
+    ${conditions.length > 0 ? sql`AND ${whereClause}` : sql``}
+    ORDER BY id DESC
+  `;
+}
+
 export async function fetchRevenue() {
   try {
     // Artificially delay a response for demo purposes.
