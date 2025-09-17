@@ -11,7 +11,7 @@ type PageProps = {
   };
 };
 
-export default async function Page({ searchParams }: PageProps) {
+export default async function Page({ searchParams }: any) {
   // searchParams から filters を整形
   const filters = {
     kana: searchParams?.kana || "",
