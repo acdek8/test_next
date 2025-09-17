@@ -1,7 +1,8 @@
-import Form from '@/app/ui/invoices/edit-form';
-import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
-import { fetchInvoiceById, fetchCustomers } from '@/app/lib/data';
+import Form from "@/app/ui/invoices/edit-form";
+import Breadcrumbs from "@/app/ui/invoices/breadcrumbs";
+import { fetchInvoiceById, fetchCustomers } from "@/app/lib/data";
 
+// ✅ params は Promise ではなく { id: string } 型
 export default async function Page({ params }: { params: { id: string } }) {
   const id = params.id;
 
@@ -16,14 +17,15 @@ export default async function Page({ params }: { params: { id: string } }) {
       {/* パンくずリスト */}
       <Breadcrumbs
         breadcrumbs={[
-          { label: 'Invoices', href: '/dashboard/invoices' },
+          { label: "Invoices", href: "/dashboard/invoices" },
           {
-            label: 'Edit Invoice',
+            label: "Edit Invoice",
             href: `/dashboard/invoices/${id}/edit`,
             active: true,
           },
         ]}
       />
+
       {/* 編集フォーム */}
       <Form invoice={invoice} customers={customers} />
     </main>
