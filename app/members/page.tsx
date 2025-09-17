@@ -1,17 +1,23 @@
-import { fetchMembers } from '@/app/lib/data';
-import MembersTable from '@/app/ui/members/table';
+import { fetchMembers } from "@/app/lib/data";
+import MembersTable from "@/app/ui/members/table";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams?: { kana?: string; ageMin?: string; ageMax?: string; tel?: string };
-}) {
+// 明示的に PageProps を定義
+type PageProps = {
+  searchParams?: {
+    kana?: string;
+    ageMin?: string;
+    ageMax?: string;
+    tel?: string;
+  };
+};
+
+export default async function Page({ searchParams }: PageProps) {
   // searchParams から filters を整形
   const filters = {
-    kana: searchParams?.kana || '',
-    ageMin: searchParams?.ageMin || '',
-    ageMax: searchParams?.ageMax || '',
-    tel: searchParams?.tel || '',
+    kana: searchParams?.kana || "",
+    ageMin: searchParams?.ageMin || "",
+    ageMax: searchParams?.ageMax || "",
+    tel: searchParams?.tel || "",
   };
 
   // DB から条件に合うメンバーを取得
@@ -22,11 +28,13 @@ export default async function Page({
       <h1 className="text-xl font-bold mb-4">メンバー一覧</h1>
 
       {/* 検索フォーム */}
-      {/* ✅ method="GET" を追加して検索ボタンで再読み込みされるようにする */}
       <form method="GET" className="mb-6 space-y-3">
         {/* ふりがな */}
         <div className="flex items-center gap-2">
-          <label htmlFor="kana" className="w-20 text-sm font-medium text-gray-700">
+          <label
+            htmlFor="kana"
+            className="w-20 text-sm font-medium text-gray-700"
+          >
             ふりがな
           </label>
           <input
@@ -61,7 +69,10 @@ export default async function Page({
 
         {/* 電話番号 */}
         <div className="flex items-center gap-2">
-          <label htmlFor="tel" className="w-20 text-sm font-medium text-gray-700">
+          <label
+            htmlFor="tel"
+            className="w-20 text-sm font-medium text-gray-700"
+          >
             電話番号
           </label>
           <input
