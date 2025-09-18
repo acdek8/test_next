@@ -1,35 +1,39 @@
+// app/members/page.tsx
+
 import { fetchMembers } from "@/app/lib/data";
 import MembersTable from "@/app/ui/members/table";
 
-// 明示的に PageProps を定義
-type PageProps = {
-  searchParams?: {
-    kana?: string;
-    ageMin?: string;
-    ageMax?: string;
-    tel?: string;
-  };
+type SearchParams = {
+  kana?: string;
+  ageMin?: string;
+  ageMax?: string;
+  tel?: string;
 };
 
-export default async function Page({ searchParams }: any) {
-  // searchParams から filters を整形
+export default async function Page({
+  // Next.js 15 では searchParams は Promise になる可能性があるので await する
+  searchParams: rawSearchParams,
+}: {
+  searchParams?: SearchParams | Promise<SearchParams>;
+}) {
+  // Promise なら await、それ以外はそのままデフォルト空オブジェクト
+  const sp: SearchParams = rawSearchParams ? await rawSearchParams : {};
+
+  // await した上でプロパティを安全に参照
   const filters = {
-    kana: searchParams?.kana || "",
-    ageMin: searchParams?.ageMin || "",
-    ageMax: searchParams?.ageMax || "",
-    tel: searchParams?.tel || "",
+    kana: sp.kana ?? "",
+    ageMin: sp.ageMin ?? "",
+    ageMax: sp.ageMax ?? "",
+    tel: sp.tel ?? "",
   };
 
-  // DB から条件に合うメンバーを取得
   const members = await fetchMembers(filters);
 
   return (
     <>
       <h1 className="text-xl font-bold mb-4">メンバー一覧</h1>
 
-      {/* 検索フォーム */}
       <form method="GET" className="mb-6 space-y-3">
-        {/* ふりがな */}
         <div className="flex items-center gap-2">
           <label
             htmlFor="kana"
@@ -39,35 +43,33 @@ export default async function Page({ searchParams }: any) {
           </label>
           <input
             id="kana"
-            type="text"
             name="kana"
+            type="text"
             placeholder="やまだ"
             defaultValue={filters.kana}
             className="border rounded px-2 py-1 w-48"
           />
         </div>
 
-        {/* 年齢範囲 */}
         <div className="flex items-center gap-2">
           <label className="w-20 text-sm font-medium text-gray-700">年齢</label>
           <input
-            type="number"
             name="ageMin"
+            type="number"
             placeholder="20"
             defaultValue={filters.ageMin}
             className="border rounded px-2 py-1 w-20"
           />
           <span>〜</span>
           <input
-            type="number"
             name="ageMax"
+            type="number"
             placeholder="30"
             defaultValue={filters.ageMax}
             className="border rounded px-2 py-1 w-20"
           />
         </div>
 
-        {/* 電話番号 */}
         <div className="flex items-center gap-2">
           <label
             htmlFor="tel"
@@ -77,15 +79,14 @@ export default async function Page({ searchParams }: any) {
           </label>
           <input
             id="tel"
-            type="text"
             name="tel"
+            type="text"
             placeholder="090-xxxx-xxxx"
             defaultValue={filters.tel}
             className="border rounded px-2 py-1 w-48"
           />
         </div>
 
-        {/* 検索ボタン */}
         <div className="flex justify-start">
           <button
             type="submit"
@@ -96,7 +97,6 @@ export default async function Page({ searchParams }: any) {
         </div>
       </form>
 
-      {/* 一覧テーブル */}
       <MembersTable members={members} />
     </>
   );

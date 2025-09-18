@@ -1,8 +1,19 @@
+// app/ui/members/MemberForm.tsx
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createMemberAction, updateMemberAction } from "@/app/lib/actions";
+
+// YYYY/MM/DD 形式に整形するヘルパー関数
+function formatDateSlash(dateString?: string) {
+  if (!dateString) return "";
+  const d = new Date(dateString);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}/${mm}/${dd}`;
+}
 
 export default function MemberForm({
   mode,
@@ -14,8 +25,16 @@ export default function MemberForm({
   memberId?: string;
 }) {
   const router = useRouter();
-  const [form, setForm] = useState(
-    initialData || {
+
+  const [form, setForm] = useState(() => {
+    if (initialData) {
+      return {
+        ...initialData,
+        // DB に保存されている "1990-09-09" → "1990/09/09" に変換
+        birth_date: formatDateSlash(initialData.birth_date),
+      };
+    }
+    return {
       last_name: "",
       first_name: "",
       kana_last_name: "",
@@ -28,8 +47,8 @@ export default function MemberForm({
       tel: "",
       profile: "",
       pm_years: "",
-    }
-  );
+    };
+  });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
