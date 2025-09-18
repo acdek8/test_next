@@ -1,4 +1,4 @@
-import postgres from 'postgres';
+import postgres from "postgres";
 import {
   CustomerField,
   CustomersTableType,
@@ -6,18 +6,25 @@ import {
   InvoicesTable,
   LatestInvoiceRaw,
   Revenue,
-} from './definitions';
-import { formatCurrency } from './utils';
+} from "./definitions";
+import { formatCurrency } from "./utils";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-export async function fetchMembers(filters: { kana?: string; ageMin?: string; ageMax?: string; tel?: string }) {
+export async function fetchMembers(filters: {
+  kana?: string;
+  ageMin?: string;
+  ageMax?: string;
+  tel?: string;
+}) {
   const conditions: any[] = [];
 
   // ふりがな検索
   if (filters.kana) {
     conditions.push(
-      sql`(kana_last_name ILIKE ${'%' + filters.kana + '%'} OR kana_first_name ILIKE ${'%' + filters.kana + '%'})`
+      sql`(kana_last_name ILIKE ${
+        "%" + filters.kana + "%"
+      } OR kana_first_name ILIKE ${"%" + filters.kana + "%"})`
     );
   }
 
@@ -39,7 +46,7 @@ export async function fetchMembers(filters: { kana?: string; ageMin?: string; ag
 
   // 電話番号
   if (filters.tel) {
-    conditions.push(sql`tel ILIKE ${'%' + filters.tel + '%'}`);
+    conditions.push(sql`tel ILIKE ${"%" + filters.tel + "%"}`);
   }
 
   // AND で条件をつなぐ（join が無い環境でも動くように自前で連結）
@@ -60,6 +67,67 @@ export async function fetchMembers(filters: { kana?: string; ageMin?: string; ag
   `;
 }
 
+export async function deleteMember(id: string) {
+  await sql`DELETE FROM members WHERE id = ${id}`;
+}
+
+export async function createMember(data: {
+  last_name: string;
+  first_name: string;
+  kana_last_name: string;
+  kana_first_name: string;
+  gender: string;
+  birth_date: string;
+  age: number;
+  post_code: string;
+  address: string;
+  tel: string;
+  profile: string;
+  pm_years: number;
+}) {
+  await sql`
+  INSERT INTO members (
+    last_name, first_name, kana_last_name, kana_first_name,
+    age, gender, birth_date, post_code, address, tel,
+    profile, pm_years, created_at, updated_at
+  ) VALUES (
+    ${data.last_name}, ${data.first_name}, ${data.kana_last_name}, ${data.kana_first_name},
+    ${data.age}, ${data.gender}, ${data.birth_date}, ${data.post_code}, ${data.address}, ${data.tel},
+    ${data.profile}, ${data.pm_years}, NOW(), NOW()
+  )
+`;
+}
+
+export async function getMemberById(id: string) {
+  const result = await sql`
+  SELECT *
+  FROM members
+  WHERE id = ${id}
+  LIMIT 1
+`;
+  return result[0];
+}
+
+export async function updateMember(id: string, data: any) {
+  await sql`
+    UPDATE members SET
+      last_name = ${data.last_name},
+      first_name = ${data.first_name},
+      kana_last_name = ${data.kana_last_name},
+      kana_first_name = ${data.kana_first_name},
+      gender = ${data.gender},
+      birth_date = ${data.birth_date},
+      age = ${data.age},
+      post_code = ${data.post_code},
+      address = ${data.address},
+      tel = ${data.tel},
+      profile = ${data.profile},
+      pm_years = ${data.pm_years},
+      updated_at = NOW()
+    WHERE id = ${id}
+  `;
+}
+
 export async function fetchRevenue() {
   try {
     // Artificially delay a response for demo purposes.
@@ -74,8 +142,8 @@ export async function fetchRevenue() {
 
     return data;
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch revenue data.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch revenue data.");
   }
 }
 
@@ -94,8 +162,8 @@ export async function fetchLatestInvoices() {
     }));
     return latestInvoices;
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch the latest invoices.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch the latest invoices.");
   }
 }
 
@@ -117,10 +185,10 @@ export async function fetchCardData() {
       invoiceStatusPromise,
     ]);
 
-    const numberOfInvoices = Number(data[0][0].count ?? '0');
-    const numberOfCustomers = Number(data[1][0].count ?? '0');
-    const totalPaidInvoices = formatCurrency(data[2][0].paid ?? '0');
-    const totalPendingInvoices = formatCurrency(data[2][0].pending ?? '0');
+    const numberOfInvoices = Number(data[0][0].count ?? "0");
+    const numberOfCustomers = Number(data[1][0].count ?? "0");
+    const totalPaidInvoices = formatCurrency(data[2][0].paid ?? "0");
+    const totalPendingInvoices = formatCurrency(data[2][0].pending ?? "0");
 
     return {
       numberOfCustomers,
@@ -129,15 +197,15 @@ export async function fetchCardData() {
       totalPendingInvoices,
     };
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch card data.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch card data.");
   }
 }
 
 const ITEMS_PER_PAGE = 6;
 export async function fetchFilteredInvoices(
   query: string,
-  currentPage: number,
+  currentPage: number
 ) {
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
@@ -165,8 +233,8 @@ export async function fetchFilteredInvoices(
 
     return invoices;
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoices.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch invoices.");
   }
 }
 
@@ -186,8 +254,8 @@ export async function fetchInvoicesPages(query: string) {
     const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
     return totalPages;
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch total number of invoices.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch total number of invoices.");
   }
 }
 
@@ -211,8 +279,8 @@ export async function fetchInvoiceById(id: string) {
 
     return invoice[0];
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoice.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch invoice.");
   }
 }
 
@@ -228,8 +296,8 @@ export async function fetchCustomers() {
 
     return customers;
   } catch (err) {
-    console.error('Database Error:', err);
-    throw new Error('Failed to fetch all customers.');
+    console.error("Database Error:", err);
+    throw new Error("Failed to fetch all customers.");
   }
 }
 
@@ -261,7 +329,7 @@ export async function fetchFilteredCustomers(query: string) {
 
     return customers;
   } catch (err) {
-    console.error('Database Error:', err);
-    throw new Error('Failed to fetch customer table.');
+    console.error("Database Error:", err);
+    throw new Error("Failed to fetch customer table.");
   }
 }

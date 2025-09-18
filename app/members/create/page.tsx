@@ -1,3 +1,5 @@
-export default function Page() {
-    return <p>create Page</p>;
-  }
+import MemberForm from "../MemberForm";
+
+export default function CreateMemberPage() {
+  return <MemberForm mode="create" />;
+}

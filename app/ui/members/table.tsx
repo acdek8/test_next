@@ -1,4 +1,7 @@
-'use client';
+"use client";
+
+import DeleteButton from "./DeleteButton";
+import EditButton from "./EditButton";
 
 export default function MembersTable({ members }: { members: any[] }) {
   return (
@@ -20,23 +23,21 @@ export default function MembersTable({ members }: { members: any[] }) {
         {members.map((m) => (
           <tr key={m.id}>
             <td className="border px-2 py-1">{m.id}</td>
-            <td className="border px-2 py-1">{m.last_name} {m.first_name}</td>
-            <td className="border px-2 py-1">{m.kana_last_name} {m.kana_first_name}</td>
+            <td className="border px-2 py-1">
+              {m.last_name} {m.first_name}
+            </td>
+            <td className="border px-2 py-1">
+              {m.kana_last_name} {m.kana_first_name}
+            </td>
             <td className="border px-2 py-1">{m.gender}</td>
-            <td className="border px-2 py-1">{m.age ?? '-'}</td>
+            <td className="border px-2 py-1">{m.age ?? "-"}</td>
             <td className="border px-2 py-1">{m.tel}</td>
             <td className="border px-2 py-1">{m.profile}</td>
-            <td className="border px-2 py-1">{new Date(m.created_at).toLocaleString()}</td>
-            <td className="border px-2 py-1">{new Date(m.updated_at).toLocaleString()}</td>
             <td className="border px-2 py-1 text-center">
-              <button className="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500">
-                編集
-              </button>
+              <EditButton memberId={m.id} />
             </td>
             <td className="border px-2 py-1 text-center">
-              <button className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600">
-                削除
-              </button>
+              <DeleteButton memberId={m.id} />
             </td>
           </tr>
         ))}
