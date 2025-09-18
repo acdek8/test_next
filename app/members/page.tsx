@@ -3,10 +3,28 @@
 import { fetchMembers } from "@/app/lib/data";
 import MembersTable from "@/app/ui/members/table";
 
-export default async function Page({ searchParams }: any) {
-  // any にしたので Promise/undefined を気にせずそのまま扱う
-  const sp = searchParams ?? {};
+type SearchParams = {
+  kana?: string;
+  ageMin?: string;
+  ageMax?: string;
+  tel?: string;
+};
 
+export default async function Page({
+  // Next.js 13+では searchParams が Promise<SearchParams> になることがあるので
+  // 一旦 rawSearchParams として受け取り、Promiseなら await する
+  searchParams: rawSearchParams,
+}: {
+  searchParams?: SearchParams | Promise<SearchParams>;
+}) {
+  // searchParams が Promise<SearchParams> なら await、undefined/オブジェクトならそのまま
+  const sp: SearchParams = rawSearchParams
+    ? typeof rawSearchParams === "object" && "then" in rawSearchParams
+      ? await rawSearchParams
+      : (rawSearchParams as SearchParams)
+    : {};
+
+  // フィルタ値を組み立て
   const filters = {
     kana: sp.kana ?? "",
     ageMin: sp.ageMin ?? "",
@@ -14,6 +32,7 @@ export default async function Page({ searchParams }: any) {
     tel: sp.tel ?? "",
   };
 
+  // データ取得
   const members = await fetchMembers(filters);
 
   return (
