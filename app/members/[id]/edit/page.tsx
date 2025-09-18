@@ -1,21 +1,26 @@
 import { getMemberById } from "@/app/lib/data";
 import MemberForm from "../../MemberForm";
 
-type Params = {
-  id: string;
-};
+ype Params = { id: string };
 
+// Next.js が定義している PageProps の制約に合うように
+// props.params を必ず Promise<Params> として受け取り
 export default async function EditMemberPage({
-  // params は Promise の場合もあるので await する
-  params: rawParams,
+  params,
 }: {
-  params?: Params | Promise<Params>;
+  params: Promise<Params>;
 }) {
-  // await すると、Promise でも通常のオブジェクトでも正しく中身を取得できる
-  const { id } = rawParams ? await rawParams : { id: "" };
+  // await して Params を展開
+  const { id } = await params;
 
-  // DB からメンバーを取得
+  // 型チェック済みの id を渡してデータ取得
   const member = await getMemberById(id);
 
-  return <MemberForm mode="edit" initialData={member} memberId={id} />;
+  return (
+    <MemberForm
+      mode="edit"
+      initialData={member}
+      memberId={id}
+    />
+  );
 }
