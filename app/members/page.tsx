@@ -11,20 +11,16 @@ type SearchParams = {
 };
 
 export default async function Page({
-  // Next.js 13+では searchParams が Promise<SearchParams> になることがあるので
-  // 一旦 rawSearchParams として受け取り、Promiseなら await する
-  searchParams: rawSearchParams,
+  // Next.js の PageProps が要求する通り、
+  // searchParams は Promise<SearchParams> として受け取る
+  searchParams,
 }: {
-  searchParams?: SearchParams | Promise<SearchParams>;
+  searchParams: Promise<SearchParams>;
 }) {
-  // searchParams が Promise<SearchParams> なら await、undefined/オブジェクトならそのまま
-  const sp: SearchParams = rawSearchParams
-    ? typeof rawSearchParams === "object" && "then" in rawSearchParams
-      ? await rawSearchParams
-      : (rawSearchParams as SearchParams)
-    : {};
+  // Promise を必ず await してからプロパティにアクセス
+  const sp = await searchParams;
 
-  // フィルタ値を組み立て
+  // フォームの初期値を組み立て
   const filters = {
     kana: sp.kana ?? "",
     ageMin: sp.ageMin ?? "",
