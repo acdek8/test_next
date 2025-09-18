@@ -1,5 +1,5 @@
-## Next.js App Router Course - Starter
+git add .
+git commit -m "検索フォームと fetchMembers 修正"
+git push origin main
 
-This is the starter template for the Next.js App Router Course. It contains the starting code for the dashboard application.
-
-For more information, see the [course curriculum](https://nextjs.org/learn) on the Next.js Website.
+npm run dev
