@@ -3,23 +3,10 @@
 import { fetchMembers } from "@/app/lib/data";
 import MembersTable from "@/app/ui/members/table";
 
-type SearchParams = {
-  kana?: string;
-  ageMin?: string;
-  ageMax?: string;
-  tel?: string;
-};
+export default async function Page({ searchParams }: any) {
+  // any にしたので Promise/undefined を気にせずそのまま扱う
+  const sp = searchParams ?? {};
 
-export default async function Page({
-  // Next.js 15 では searchParams は Promise になる可能性があるので await する
-  searchParams: rawSearchParams,
-}: {
-  searchParams?: SearchParams | Promise<SearchParams>;
-}) {
-  // Promise なら await、それ以外はそのままデフォルト空オブジェクト
-  const sp: SearchParams = rawSearchParams ? await rawSearchParams : {};
-
-  // await した上でプロパティを安全に参照
   const filters = {
     kana: sp.kana ?? "",
     ageMin: sp.ageMin ?? "",
