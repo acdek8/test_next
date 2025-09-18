@@ -109,22 +109,32 @@ export async function getMemberById(id: string) {
 }
 
 export async function updateMember(id: string, data: any) {
+  const idNum = parseInt(id, 10);
+  if (isNaN(idNum)) {
+    throw new Error(`Invalid member id: ${id}`);
+  }
+
+  const birthDate = data.birth_date ?? null;
+  const age = parseInt(String(data.age), 10) || 0;
+  const postCode = data.post_code ?? null;
+  const pmYears = parseInt(String(data.pm_years), 10) || 0;
+
   await sql`
-    UPDATE members SET
-      last_name = ${data.last_name},
-      first_name = ${data.first_name},
-      kana_last_name = ${data.kana_last_name},
-      kana_first_name = ${data.kana_first_name},
-      gender = ${data.gender},
-      birth_date = ${data.birth_date},
-      age = ${data.age},
-      post_code = ${data.post_code},
-      address = ${data.address},
-      tel = ${data.tel},
-      profile = ${data.profile},
-      pm_years = ${data.pm_years},
-      updated_at = NOW()
-    WHERE id = ${id}
+    UPDATE members
+    SET
+      last_name        = ${data.last_name},
+      first_name       = ${data.first_name},
+      kana_last_name   = ${data.kana_last_name},
+      kana_first_name  = ${data.kana_first_name},
+      gender           = ${data.gender},
+      birth_date       = ${birthDate},
+      age              = ${age},
+      post_code        = ${postCode},
+      address          = ${data.address},
+      tel              = ${data.tel},
+      profile          = ${data.profile},
+      pm_years         = ${pmYears}
+    WHERE id = ${idNum}
   `;
 }
 
