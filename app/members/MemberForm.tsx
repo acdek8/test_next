@@ -72,13 +72,37 @@ export default function MemberForm({
       setErrors(validationErrors);
       return;
     }
+    const pmYearsRaw = form.pm_years.trim();
+    const pm_years =
+      pmYearsRaw === "" || isNaN(Number(pmYearsRaw))
+        ? 0
+        : parseInt(pmYearsRaw, 10);
+    // birth_date を "yyyy-mm-dd" に変換（DB登録用）
+    const birth_date = form.birth_date.replaceAll("/", "-");
+
+    // 年齢を計算（DB登録用）
+    function calculateAge(dateStr: string): number {
+      const birth = new Date(dateStr);
+      const today = new Date();
+      const age =
+        today.getFullYear() -
+        birth.getFullYear() -
+        (today <
+        new Date(today.getFullYear(), birth.getMonth(), birth.getDate())
+          ? 1
+          : 0);
+      return isNaN(age) ? 0 : age;
+    }
+    const age = calculateAge(birth_date);
 
     // PM経験が未入力なら "0" を補完
     const normalizedForm = {
       ...form,
-      pm_years: form.pm_years.trim() === "" ? "0" : form.pm_years,
+      pm_years,
       post_code: `${form.post_code_1}-${form.post_code_2}`,
-      gender: form.gender, // ✅ "0" | "1" | "2" をそのまま送信
+      gender: parseInt(form.gender, 10),
+      birth_date, // ← ハイフン形式でDBへ
+      age, // ← 数値でDBへ
     };
 
     if (mode === "create") {
@@ -105,6 +129,7 @@ export default function MemberForm({
             name="last_name"
             value={form.last_name}
             onChange={handleChange}
+            placeholder="山田"
             className="border px-2 py-1 w-40"
           />
           <label className="text-sm text-gray-700">（名）</label>
@@ -112,6 +137,7 @@ export default function MemberForm({
             name="first_name"
             value={form.first_name}
             onChange={handleChange}
+            placeholder="太郎"
             className="border px-2 py-1 w-40"
           />
         </div>
@@ -134,6 +160,7 @@ export default function MemberForm({
             name="kana_last_name"
             value={form.kana_last_name}
             onChange={handleChange}
+            placeholder="やまだ"
             className="border px-2 py-1 w-40"
           />
           <label className="text-sm text-gray-700">（名）</label>
@@ -141,6 +168,7 @@ export default function MemberForm({
             name="kana_first_name"
             value={form.kana_first_name}
             onChange={handleChange}
+            placeholder="たろう"
             className="border px-2 py-1 w-40"
           />
         </div>
@@ -208,7 +236,7 @@ export default function MemberForm({
             name="birth_date"
             value={form.birth_date}
             onChange={handleChange}
-            placeholder="YYYY/MM/DD"
+            placeholder="2025/07/25"
             className="border px-2 py-1 w-40"
           />
         </div>
@@ -254,6 +282,7 @@ export default function MemberForm({
             name="address"
             value={form.address}
             onChange={handleChange}
+            placeholder="○○県○○市○○区○○町　○○マンション○○号室"
             className="border px-2 py-1 w-full"
           />
         </div>
@@ -292,6 +321,7 @@ export default function MemberForm({
             value={form.profile}
             onChange={handleChange}
             className="border px-2 py-1 w-full h-24"
+            placeholder="株式会社××に新卒として入社後…"
           />
         </div>
         {errors.profile && (

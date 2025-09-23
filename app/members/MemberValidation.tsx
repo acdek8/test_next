@@ -47,13 +47,15 @@ export function validateMemberForm(form: Record<string, string>) {
     errors.gender = "性別を選択してください。";
   }
 
-  if (!form.birth_date || !dateRegex.test(form.birth_date)) {
-    errors.birth_date =
-      "未来の日付は登録できません。正しい形式で入力してください。";
+  if (!form.birth_date) {
+    errors.birth_date = "生年月日は必須です。";
+  } else if (!dateRegex.test(form.birth_date)) {
+    errors.birth_date = "正しい形式（YYYY/MM/DD）で入力してください。";
   } else {
     const inputDate = new Date(form.birth_date.replaceAll("/", "-"));
-    if (inputDate > new Date()) {
-      errors.birth_date = "未来の日付は入力できません";
+    const today = new Date();
+    if (inputDate > today) {
+      errors.birth_date = "未来の日付は入力できません。";
     }
   }
 
