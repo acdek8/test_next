@@ -21,7 +21,7 @@ export default function MembersTable({ members }: { members: any[] }) {
           <th className="border px-2 py-1">電話番号</th>
           <th className="border px-2 py-1">プロフィール</th>
           <th className="border px-2 py-1">PM経験年数</th>
-          <th className="border px-2 py-1">更新日時</th>
+          <th className="border px-2 py-1">登録日時</th>
           <th className="border px-2 py-1 text-center"></th>
         </tr>
       </thead>

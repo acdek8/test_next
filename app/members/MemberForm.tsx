@@ -71,9 +71,12 @@ export default function MemberForm({
     const validationErrors = validateMemberForm(form);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      mode === "create" ? "保存に失敗しました。。" : "変換処理に失敗しました。";
+      setFormErrorMessage(
+        mode === "create" ? "保存に失敗しました。" : "変換処理に失敗しました。"
+      );
       return;
     }
+
     const pmYearsRaw = form.pm_years.trim();
     const pm_years =
       pmYearsRaw === "" || isNaN(Number(pmYearsRaw))
@@ -232,7 +235,7 @@ export default function MemberForm({
       </div>
       {/* 生年月日 */}
       <div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <label className="w-32 font-semibold">生年月日</label>
           <input
             name="birth_date"
@@ -251,7 +254,7 @@ export default function MemberForm({
       </div>
       {/* 郵便番号 */}
       <div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <label className="w-32 font-semibold">郵便番号</label>
           <input
             name="post_code_1"
@@ -278,7 +281,7 @@ export default function MemberForm({
       </div>
       {/* 住所 */}
       <div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <label className="w-32 font-semibold">住所</label>
           <input
             name="address"
@@ -291,13 +294,10 @@ export default function MemberForm({
         {errors.address && (
           <p className="text-xs text-red-500 mt-1 ml-32">{errors.address}</p>
         )}
-        <p className="text-sm text-gray-600 mt-1 ml-32">
-          全角で入力してください。
-        </p>
       </div>
       {/* 電話番号 */}
       <div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <label className="w-32 font-semibold">電話番号</label>
           <input
             name="tel"
@@ -316,7 +316,7 @@ export default function MemberForm({
       </div>
       {/* プロフィール */}
       <div>
-        <div className="flex items-start gap-4">
+        <div className="flex items-start gap-2">
           <label className="w-32 font-semibold pt-1">プロフィール</label>
           <textarea
             name="profile"
@@ -335,7 +335,7 @@ export default function MemberForm({
       </div>
       {/* PM経験年数 */}{" "}
       <div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <label className="w-32 font-semibold">PM経験年数</label>
           <div className="flex items-center gap-2">
             <input
@@ -355,9 +355,7 @@ export default function MemberForm({
       {/* ボタン */}
       <div className="pt-4">
         {formErrorMessage && (
-          <div
-            style={{ color: "red", marginBottom: "1rem", fontWeight: "bold" }}
-          >
+          <div className="text-red-600 mb-2 text-sm font-semibold">
             {formErrorMessage}
           </div>
         )}
