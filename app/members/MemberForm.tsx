@@ -58,6 +58,7 @@ export default function MemberForm({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -70,6 +71,7 @@ export default function MemberForm({
     const validationErrors = validateMemberForm(form);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      mode === "create" ? "保存に失敗しました。。" : "変換処理に失敗しました。";
       return;
     }
     const pmYearsRaw = form.pm_years.trim();
@@ -352,6 +354,13 @@ export default function MemberForm({
       </div>
       {/* ボタン */}
       <div className="pt-4">
+        {formErrorMessage && (
+          <div
+            style={{ color: "red", marginBottom: "1rem", fontWeight: "bold" }}
+          >
+            {formErrorMessage}
+          </div>
+        )}
         <button
           type="submit"
           className={`px-6 py-2 rounded text-white ${

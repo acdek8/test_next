@@ -77,8 +77,8 @@ export function validateMemberForm(form: Record<string, string>) {
       "電話番号は必須項目です。電話番号は10〜11桁の半角数字で入力してください";
   }
 
-  if (form.profile.length > 200) {
-    errors.profile = "プロフィールは200文字以内で入力してください";
+  if (form.profile.length < 20 || form.profile.length > 200) {
+    errors.profile = "プロフィールは20文字以上200文字以内で入力してください";
   }
 
   return errors;
